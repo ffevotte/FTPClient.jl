@@ -142,7 +142,7 @@ function ftp_get(
         @ce_curl curl_easy_setopt CURLOPT_PROXY_TRANSFER_MODE Int64(1)
 
         ftp_url = url(ctxt)
-        full_url = ftp_url * file_name
+        full_url = ftp_url * escapeuri(file_name)
         if mode == binary_mode
             @ce_curl curl_easy_setopt CURLOPT_URL full_url * ";type=i"
         elseif mode == ascii_mode
@@ -210,7 +210,7 @@ function ftp_put(
     @ce_curl curl_easy_setopt CURLOPT_READFUNCTION C_CURL_READ_CB[]
 
     ftp_url = url(ctxt)
-    @ce_curl curl_easy_setopt CURLOPT_URL ftp_url * file_name
+    @ce_curl curl_easy_setopt CURLOPT_URL ftp_url * escapeuri(file_name)
 
     if mode == binary_mode
         @ce_curl curl_easy_setopt CURLOPT_TRANSFERTEXT Int64(0)
