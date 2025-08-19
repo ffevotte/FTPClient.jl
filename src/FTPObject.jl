@@ -41,7 +41,7 @@ function FTP(;
     verbose::Union{Bool,IOStream}=false,
 )
     options = RequestOptions(
-        username=username, password=password, hostname=hostname, port=port,
+        username=escapeuri(username), password=escapeuri(password), hostname=hostname, port=port,
         ssl=ssl, implicit=implicit, verify_peer=verify_peer, active_mode=active_mode,
     )
 

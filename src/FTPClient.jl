@@ -1,6 +1,7 @@
 module FTPClient
 
 using URIParser: URI
+using URIs: escapeuri
 
 mutable struct FTPClientError <: Exception
     msg::AbstractString
