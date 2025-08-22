@@ -2,6 +2,7 @@ using Test
 using FTPClient
 using FTPServer
 using FTPServer: username, password, hostname, port, HOMEDIR, tempfile
+using URIs
 
 # FTP code for when the file transfer is complete.
 const complete_transfer_code = 226
@@ -23,6 +24,7 @@ upload_file_3 = "test_upload_3.txt"
 upload_file_4 = "test_upload_4.txt"
 
 download_file = "test_download.txt"
+download_file_2 = "test download:2.txt"
 
 @testset "all_tests" begin
 
@@ -33,7 +35,10 @@ download_file = "test_download.txt"
         tempfile(upload_file_4)
 
         tempfile(joinpath(HOMEDIR, download_file))
+        tempfile(joinpath(HOMEDIR, download_file_2))
+
         cleanup_file(download_file)
+        cleanup_file(download_file_2)
         cleanup_file(joinpath(HOMEDIR, upload_file))
 
         @testset "All Tests" begin

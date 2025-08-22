@@ -18,6 +18,19 @@ function no_unexpected_changes(ftp::FTP, url::AbstractString=FTPClient.trailing(
     close(other)
 end
 
+function test_parseable_uri(; kwargs...)
+    opts_nt = (; kwargs...)
+    ftp = FTP(; opts_nt...)
+    uri = URI(ftp.ctxt.url)
+    @test uri.host == opts_nt.hostname
+    @test uri.port == string(opts_nt.port)
+
+    userinfo = split(uri.userinfo, ":")
+    @test unescapeuri(get(userinfo, 1, "")) == opts_nt.username
+    @test unescapeuri(get(userinfo, 2, "")) == opts_nt.password
+    close(ftp)
+end
+
 function expected_output(active::Bool)
     mode = active ? "active" : "passive"
     expected = """
@@ -90,6 +103,18 @@ end
     # Validate that FTP is treated as a scalar during broadcasting
     ftp = FTP(; opts...)
     @test size(ftp .== ftp) == ()
+end
+
+@testset "parseable url" begin
+    @testset "default case" begin
+        test_parseable_uri(; opts...)
+    end
+    @testset "user name with special chars" begin
+        test_parseable_uri(; opts..., username="john.doe@example.com")
+    end
+    @testset "password with special chars" begin
+        test_parseable_uri(; opts..., password="p@ss:word")
+    end
 end
 
 @testset "connection with url" begin
@@ -498,6 +523,18 @@ end
         end
         @test num_bytes > 0
         @test read(buffer, String) == read(joinpath(HOMEDIR, download_file), String)
+        no_unexpected_changes(ftp)
+        close(ftp)
+    end
+
+    @testset "download with spaces in file name" begin
+        local ftp, buffer
+        num_bytes = captured_size() do io
+            ftp = FTP(; opts..., verbose=io)
+            buffer = download(ftp, download_file_2)
+        end
+        @test num_bytes > 0
+        @test read(buffer, String) == read(joinpath(HOMEDIR, download_file_2), String)
         no_unexpected_changes(ftp)
         close(ftp)
     end
